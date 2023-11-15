@@ -4,6 +4,7 @@
 #include <time.h>
 #include <math.h>
 #include <iostream>
+#include <iomanip> 
 #include <typeinfo>
 #include "../Lib/cpu.h"
 #include "../Lib/init.h"
@@ -12,51 +13,57 @@
 int main(int argc, char *argv[])
 {
     clock_t start, end;
-    float *matrixA, *matrixB;
+    float *matrix_a, *matrix_b;
     int n = atoi(argv[1]);
 
-    bool printMatrixOption;
+    bool print_matrix_option;
 
-    if(strcmp(argv[2], "yes") != 0)
+    if(argv[2] == nullptr || strcmp(argv[2], "yes") != 0)
     {
-        printMatrixOption = false;
+        print_matrix_option = false;
     }
     else
     {
-        printMatrixOption = true;
+        print_matrix_option = true;
     }
 
-    matrixA = (float *)malloc(sizeof(float) * n * n);
-    matrixB = (float *)malloc(sizeof(float) * n * n);
+    matrix_a = (float *)malloc(sizeof(float) * n * n);
+    matrix_b = (float *)malloc(sizeof(float) * n * n);
 
-    initDataRandom(matrixA, n * n);
+    init_data_random(matrix_a, n * n);
     
-    bool isA = true;
+    bool is_matrix_a_with_data = true;
+    start = clock();
     for (int i = 1; i < n * 2; i = i << 1)
     {
-        if (isA)
+        if (is_matrix_a_with_data)
         {
-            cpu_mmatrix(matrixB, matrixA, matrixA, n);
-            isA = false;
+            cpu_mmatrix(matrix_b, matrix_a, matrix_a, n);
+            is_matrix_a_with_data = false;
         }
         else
         {
-            cpu_mmatrix(matrixA, matrixB, matrixB, n);
-            isA = true;
+            cpu_mmatrix(matrix_a, matrix_b, matrix_b, n);
+            is_matrix_a_with_data = true;
+        }
+    }
+    end = clock();
+
+
+    if(print_matrix_option)
+    {
+        if (is_matrix_a_with_data)
+        {
+            print_matrix(matrix_b, n * n);
+        }
+        else
+        {
+            print_matrix(matrix_a, n * n);
         }
     }
 
-    if(printMatrixOption)
-    {
-        if (isA)
-        {
-            printMatrix(matrixB, n * n);
-        }
-        else
-        {
-            printMatrix(matrixA, n * n);
-        }
-    }
+    double running_time = (double)(end - start) / CLOCKS_PER_SEC;
+    std::cout << "Time: " << running_time << '\n';
 
     return 0;
 }
