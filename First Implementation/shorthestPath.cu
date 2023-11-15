@@ -12,12 +12,12 @@
 int main(int argc, char *argv[])
 {
 
-    int deviceId, numberOfSMs;
+    int device_id, number_of_sms;
     clock_t start, end;
 
-    cudaDeviceProp deviceProp;
-    cudaGetDeviceProperties(&deviceProp, 0);
-    printf("device %d: %s \n", 0, deviceProp.name);
+    cudaDeviceProp device_prop;
+    cudaGetDeviceProperties(&device_prop, 0);
+    printf("device %d: %s \n", 0, device_prop.name);
     cudaSetDevice(0);
 
     size_t bytes = N * N * sizeof(float);
@@ -33,8 +33,8 @@ int main(int argc, char *argv[])
     h_cpu = (float *)malloc(bytes);
     h_tiled = (float *)malloc(bytes);
 
-    initDataRandom(h_a, N * N);
-    initDataRandom(h_b, N * N);
+    init_data_random(h_a, N * N);
+    init_data_random(h_b, N * N);
 
     return 0;
 }

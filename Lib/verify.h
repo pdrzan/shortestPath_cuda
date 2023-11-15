@@ -1,4 +1,4 @@
-void checkResults(float *cpu, float *gpu, int size)
+void check_results(float *cpu, float *gpu, int size)
 {
     bool pass = true;
     for (int i = 0; i < size; ++i)

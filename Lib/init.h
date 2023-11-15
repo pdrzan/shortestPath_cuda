@@ -1,4 +1,4 @@
-void initDataRandom(float *matrix, int size)
+void init_data_random(float *matrix, int size)
 {
     int n = sqrt(size);
     srand(time(NULL));
