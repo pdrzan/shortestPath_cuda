@@ -22,7 +22,7 @@ void init_data_random(float *matrix, int size)
         int jj = rand() % n;
         if (matrix[ii * n + jj] == __FLT_MAX__)
         {
-            matrix[ii * n + jj] = rand() % n;
+            matrix[ii * n + jj] = (rand() % n) + 1;
         }
     }
 }
