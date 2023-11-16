@@ -7,15 +7,15 @@ __global__ void matrixMul_tiled(float *a, int n)
     int col = blockIdx.x * blockDim.x + threadIdx.x;
 
     // Statically allocated shared memory
-    __shared__ int s_a[SHMEM_SIZE];
-    __shared__ int s_b[SHMEM_SIZE];
+    __shared__ float s_a[SHMEM_SIZE];
+    __shared__ float s_b[SHMEM_SIZE];
 
     // Accumulate in temporary variable
-    int tmp = __FLT_MAX__;
 
     // Sweep tile across matrix
     for (int k = 1; k < n * 2; k = k << 1)
     {
+        float tmp = __FLT_MAX__;
         for (int i = 0; i < n; i += blockDim.x)
         {
             // Load in elements for this tile
@@ -28,8 +28,8 @@ __global__ void matrixMul_tiled(float *a, int n)
             // Do matrix multiplication on the small matrix
             for (int j = 0; j < blockDim.x; j++)
             {
-                int localtmp = s_a[threadIdx.y * blockDim.x + j] + s_b[j * blockDim.x + threadIdx.x];
-                if(localtmp < tmp)
+                float localtmp = s_a[threadIdx.y * blockDim.x + j] + s_b[j * blockDim.x + threadIdx.x];
+                if (localtmp < tmp)
                 {
                     tmp = localtmp;
                 }
@@ -41,5 +41,6 @@ __global__ void matrixMul_tiled(float *a, int n)
 
         // Write back results
         a[row * n + col] = tmp;
+        __syncthreads();
     }
 }
