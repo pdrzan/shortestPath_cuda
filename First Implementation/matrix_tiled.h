@@ -1,3 +1,5 @@
+const int SHMEM_SIZE = N;
+
 __global__ void matrixMul_tiled(float *a, int n)
 {
     // Compute each thread's global row and column index
@@ -5,8 +7,8 @@ __global__ void matrixMul_tiled(float *a, int n)
     int col = blockIdx.x * blockDim.x + threadIdx.x;
 
     // Statically allocated shared memory
-    __shared__ int s_a[n];
-    __shared__ int s_b[n];
+    __shared__ int s_a[SHMEM_SIZE];
+    __shared__ int s_b[SHMEM_SIZE];
 
     // Accumulate in temporary variable
     int tmp = __FLT_MAX__;
