@@ -28,7 +28,11 @@ __global__ void matrixMul_tiled(float *a, int n)
             // Do matrix multiplication on the small matrix
             for (int j = 0; j < blockDim.x; j++)
             {
-                tmp = std::min(s_a[threadIdx.y * blockDim.x + j] + s_b[j * blockDim.x + threadIdx.x], tmp);
+                int localtmp = s_a[threadIdx.y * blockDim.x + j] + s_b[j * blockDim.x + threadIdx.x];
+                if(localtmp < tmp)
+                {
+                    tmp = localtmp;
+                }
             }
 
             // Wait for all threads to finish using current tiles before loading in new ones
