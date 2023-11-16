@@ -12,6 +12,7 @@
 #include "matrix_tiled.h"
 
 const int N = 4;
+const int SHMEM_SIZE = N;
 
 int main(int argc, char *argv[])
 {
