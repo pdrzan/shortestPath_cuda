@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
 
     check_results(h_cpu, h_a, n * n);
 
-    free(h_cpu); free(h_tiled); free(h_a); free(h_b); 
+    free(h_cpu); free(h_tiled); free(h_a);  
     cudaFree(d_tiled); cudaFree(d_a); cudaFree(d_b);
 
     return 0;
