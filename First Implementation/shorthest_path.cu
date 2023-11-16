@@ -1,3 +1,5 @@
+#define N 4
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,7 +13,6 @@
 #include "../Lib/time_analysis.h"
 #include "matrix_tiled.h"
 
-const int N = 4;
 const int SHMEM_SIZE = N;
 
 int main(int argc, char *argv[])
