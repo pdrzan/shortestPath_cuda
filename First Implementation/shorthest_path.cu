@@ -37,33 +37,30 @@ int main(int argc, char *argv[])
 
     std::cout << "Matrix memory occupation" << bytes << '\n';
 
-    float *h_a, *h_b, *h_cpu, *h_tiled;
+    float *h_a, *h_cpu, *h_tiled;
     float *d_a, *d_b, *d_tiled;
     float time_cpu, time_gpu_naive, time_gpu_tiled;
 
     h_a = (float *)malloc(bytes);
-    h_b = (float *)malloc(bytes);
     // h_cpu = (float *)malloc(bytes);
     h_tiled = (float *)malloc(bytes);
 
     init_data_random(h_a, n * n);
-    init_data_random(h_b, n * n);
+
     // memset(h_cpu, 0, bytes);
     memset(h_tiled, 0, bytes);
 
     cudaMalloc(&d_a, bytes);
-    cudaMalloc(&d_b, bytes);
     cudaMalloc(&d_tiled, bytes);
 
     cudaMemcpy(d_a, h_a, bytes, cudaMemcpyHostToDevice);
-    cudaMemcpy(d_b, h_b, bytes, cudaMemcpyHostToDevice);
     cudaMemcpy(d_tiled, h_tiled, bytes, cudaMemcpyHostToDevice);
 
-    // start = clock();
-    // cpu_mmatrix(h_cpu, h_a, h_b, n);
-    // end = clock();
+    start = clock();
+    cpu_mmatrix(h_cpu, h_a, h_a, n);
+    end = clock();
 
-    int n_threads = 32;
+    int n_threads = 2;
     int n_blocks = n / threads;
 
     dim3 threads(n_threads, n_threads);
@@ -74,11 +71,14 @@ int main(int argc, char *argv[])
     std::cout << "Threads(total) " << n_threads * n_blocks << '\n';
 
     time_start();
-    matrixMul_tiled<<<blocks, threads>>>(d_tiled, d_a, d_b, n);
+    matrixMul_tiled<<<blocks, threads>>>(d_a, n);
     cudaDeviceSynchronize();
     time_end();
+
     cudaMemcpy(h_tiled, d_tiled, bytes, cudaMemcpyDeviceToHost);
     std::cout << "Time: " << elapsed_time << '\n';
+
+    check_results(h_cpu, h_a);
 
     free(h_cpu); free(h_tiled); free(h_a); free(h_b); 
     cudaFree(d_tiled); cudaFree(d_a); cudaFree(d_b);
