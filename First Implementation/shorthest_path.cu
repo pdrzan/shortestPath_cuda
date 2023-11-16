@@ -32,12 +32,12 @@ int main(int argc, char *argv[])
 
     cudaDeviceProp device_prop;
     cudaGetDeviceProperties(&device_prop, 0);
-    printf("Device %D: %s \n", 0, device_prop.name);
+    std::cout << "Device " << 0 << ": " << device_prop.name << '\n';
     cudaSetDevice(0);
 
     size_t bytes = n * n * sizeof(float);
 
-    std::cout << "Matrix memory occupation" << bytes << '\n';
+    std::cout << "Matrix memory occupation " << bytes << '\n';
 
     float *h_a, *h_cpu, *h_tiled;
     float *d_a, *d_b, *d_tiled;
