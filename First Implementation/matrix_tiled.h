@@ -1,3 +1,5 @@
+const int SHMEM_SIZE = N;
+
 __global__ void matrixMul_tiled(float *a, int n)
 {
     // Compute each thread's global row and column index

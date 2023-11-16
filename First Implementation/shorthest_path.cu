@@ -13,8 +13,6 @@
 #include "../Lib/time_analysis.h"
 #include "matrix_tiled.h"
 
-const int SHMEM_SIZE = N;
-
 int main(int argc, char *argv[])
 {
 
