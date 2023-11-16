@@ -31,6 +31,12 @@ int main(int argc, char *argv[])
     matrix_b = (float *)malloc(sizeof(float) * n * n);
 
     init_data_random(matrix_a, n * n);
+
+    if(print_matrix_option)
+    {
+        std::cout << "Initial distance matrix:\n";
+        print_matrix(matrix_a, n * n);
+    }
     
     bool is_matrix_a_with_data = true;
     start = clock();
@@ -52,6 +58,7 @@ int main(int argc, char *argv[])
 
     if(print_matrix_option)
     {
+        std::cout << "Resulting distance matrix:\n";
         if (is_matrix_a_with_data)
         {
             print_matrix(matrix_b, n * n);
