@@ -11,6 +11,8 @@
 #include "../Lib/time_analysis.h"
 #include "matrix_tiled.h"
 
+#define N 4
+
 int main(int argc, char *argv[])
 {
 
@@ -61,7 +63,7 @@ int main(int argc, char *argv[])
     end = clock();
 
     int n_threads = 2;
-    int n_blocks = n / threads;
+    int n_blocks = n / n_threads;
 
     dim3 threads(n_threads, n_threads);
     dim3 blocks(n_blocks, n_blocks);
@@ -78,7 +80,7 @@ int main(int argc, char *argv[])
     cudaMemcpy(h_tiled, d_tiled, bytes, cudaMemcpyDeviceToHost);
     std::cout << "Time: " << elapsed_time << '\n';
 
-    check_results(h_cpu, h_a);
+    check_results(h_cpu, h_a, n * n);
 
     free(h_cpu); free(h_tiled); free(h_a); free(h_b); 
     cudaFree(d_tiled); cudaFree(d_a); cudaFree(d_b);
