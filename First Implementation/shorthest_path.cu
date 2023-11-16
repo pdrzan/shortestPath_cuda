@@ -11,7 +11,7 @@
 #include "../Lib/time_analysis.h"
 #include "matrix_tiled.h"
 
-#define N 4
+const int N = 4;
 
 int main(int argc, char *argv[])
 {
@@ -61,6 +61,9 @@ int main(int argc, char *argv[])
     start = clock();
     cpu_mmatrix(h_cpu, h_a, h_a, n);
     end = clock();
+
+    time_cpu = (double)(end - start) / CLOCKS_PER_SEC;
+    std::cout << "Time: " << time_cpu << '\n';
 
     int n_threads = 2;
     int n_blocks = n / n_threads;
