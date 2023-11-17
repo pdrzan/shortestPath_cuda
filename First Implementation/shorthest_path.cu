@@ -1,4 +1,3 @@
-% % writefile "shortestPath_cuda/First Implementation/shorthest_path.cu"
 #define N 512
 
 #include <stdio.h>
