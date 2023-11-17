@@ -1,3 +1,4 @@
+% % writefile "shortestPath_cuda/First Implementation/shorthest_path.cu"
 #define N 512
 
 #include <stdio.h>
@@ -15,9 +16,10 @@
 #include "../Lib/print_matrix.h"
 #include "matrix_tiled.h"
 
-int main(int argc, char *argv[])
+    int
+    main(int argc, char *argv[])
 {
-    clock_t start, end;
+    // clock_t start, end;
     bool print_matrix_option;
 
     if (argv[1] == nullptr || strcmp(argv[1], "yes") != 0)
@@ -38,14 +40,13 @@ int main(int argc, char *argv[])
 
     std::cout << "Matrix memory occupation " << bytes << '\n';
 
-    float *h_a, *h_cpu_a, *h_cpu_b, *h_tiled;
-    float *d_a, *d_tiled;
-    float time_cpu, time_gpu_tiled;
+    float *h_a; //, *h_cpu_a, *h_cpu_b;
+    float *d_a;
+    float time_gpu_tiled; //, time_cpu;
 
     h_a = (float *)malloc(bytes);
-    h_tiled = (float *)malloc(bytes);
-    h_cpu_a = (float *)malloc(bytes);
-    h_cpu_b = (float *)malloc(bytes);
+    // h_cpu_a = (float *)malloc(bytes);
+    // h_cpu_b = (float *)malloc(bytes);
 
     init_data_random(h_a, N * N);
 
@@ -55,41 +56,38 @@ int main(int argc, char *argv[])
         print_matrix(h_a, N * N);
     }
 
-    memset(h_tiled, 0, bytes);
-    memset(h_cpu_b, 0, bytes);
+    // memset(h_cpu_b, 0, bytes);
 
-    copy_matrix(h_a, h_cpu_a, N * N);
+    // copy_matrix(h_a, h_cpu_a, N * N);
 
-    cudaMalloc(&d_a, bytes + 1);
-    cudaMalloc(&d_tiled, bytes);
+    cudaMalloc(&d_a, bytes);
 
     cudaMemcpy(d_a, h_a, bytes, cudaMemcpyHostToDevice);
-    cudaMemcpy(d_tiled, h_tiled, bytes, cudaMemcpyHostToDevice);
 
-    bool is_matrix_a_with_data = true;
-    start = clock();
-    for (int i = 1; i < N * 2; i = i << 1)
-    {
-        if (is_matrix_a_with_data)
-        {
-            cpu_mmatrix(h_cpu_b, h_cpu_a, h_cpu_a, N);
-            is_matrix_a_with_data = false;
-        }
-        else
-        {
-            cpu_mmatrix(h_cpu_a, h_cpu_b, h_cpu_b, N);
-            is_matrix_a_with_data = true;
-        }
-    }
-    end = clock();
-    if (!is_matrix_a_with_data)
-    {
-        copy_matrix(h_cpu_b, h_cpu_a, N * N);
-    }
+    // bool is_matrix_a_with_data = true;
+    // start = clock();
+    // for (int i = 1; i < N * 2; i = i << 1)
+    // {
+    //     if (is_matrix_a_with_data)
+    //     {
+    //         cpu_mmatrix(h_cpu_b, h_cpu_a, h_cpu_a, N);
+    //         is_matrix_a_with_data = false;
+    //     }
+    //     else
+    //     {
+    //         cpu_mmatrix(h_cpu_a, h_cpu_b, h_cpu_b, N);
+    //         is_matrix_a_with_data = true;
+    //     }
+    // }
+    // end = clock();
+    // if (!is_matrix_a_with_data)
+    // {
+    //     copy_matrix(h_cpu_b, h_cpu_a, N * N);
+    // }
 
-    time_cpu = (double)(end - start) / CLOCKS_PER_SEC;
+    // time_cpu = (double)(end - start) / CLOCKS_PER_SEC;
 
-    int n_threads = 16;
+    int n_threads = 32;
     int n_blocks = N / n_threads;
 
     dim3 threads(n_threads, n_threads);
@@ -112,23 +110,22 @@ int main(int argc, char *argv[])
 
     if (print_matrix_option)
     {
-        std::cout << "====================================\n";
-        print_matrix(h_cpu_a, N * N);
-        std::cout << "====================================\n";
+        // std::cout << "====================================\n";
+        // print_matrix(h_cpu_a, N * N);
+        // std::cout << "====================================\n";
         std::cout << "Resulting distance matrix:\n";
         print_matrix(h_a, N * N);
     }
 
-    check_results(h_cpu_a, h_a, N * N);
+    // check_results(h_cpu_a, h_a, N * N);
 
-    std::cout << "Time cpu: " << std::fixed << time_cpu << '\n';
-    std::cout << "Time gpu: " << std::fixed << time_gpu_tiled << '\n';
+    // std::cout << "Time cpu: " << std::fixed << time_cpu << '\n';
+    std::cout << "Time gpu: " << std::fixed << time_gpu_tiled << " ms" << '\n';
 
-    free(h_cpu_a);
-    free(h_cpu_b);
-    free(h_tiled);
+    // free(h_cpu_a);
+    // free(h_cpu_b);
+    // free(h_tiled);
     free(h_a);
-    cudaFree(d_tiled);
     cudaFree(d_a);
 
     return 0;
