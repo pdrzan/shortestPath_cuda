@@ -1,6 +1,6 @@
 const int SHMEM_SIZE = N;
 
-__global__ void matrixMul_tiled(float *a, int n)
+__global__ void matrixMul_tiled(float *a)
 {
     // Compute each thread's global row and column index
     int row = blockIdx.y * blockDim.y + threadIdx.y;
@@ -11,36 +11,33 @@ __global__ void matrixMul_tiled(float *a, int n)
     __shared__ float s_b[SHMEM_SIZE];
 
     // Accumulate in temporary variable
+    float tmp = __FLT_MAX__;
 
-    // Sweep tile across matrix
-    for (int k = 1; k < n * 2; k = k << 1)
+    // Sweep tile across matrix=
+    __syncthreads();
+    for (int i = 0; i < N; i += blockDim.x)
     {
-        float tmp = __FLT_MAX__;
-        for (int i = 0; i < n; i += blockDim.x)
+        // Load in elements for this tile
+        s_a[threadIdx.y * blockDim.x + threadIdx.x] = a[row * N + i + threadIdx.x];
+        s_b[threadIdx.y * blockDim.x + threadIdx.x] = a[i * N + threadIdx.y * N + col];
+
+        // Wait for both tiles to be loaded in before doing computation
+        __syncthreads();
+
+        // Do matrix multiplication on the small matrix
+        for (int j = 0; j < blockDim.x; j++)
         {
-            // Load in elements for this tile
-            s_a[threadIdx.y * blockDim.x + threadIdx.x] = a[row * n + i + threadIdx.x];
-            s_b[threadIdx.y * blockDim.x + threadIdx.x] = a[i * n + threadIdx.y * n + col];
-
-            // Wait for both tiles to be loaded in before doing computation
-            __syncthreads();
-
-            // Do matrix multiplication on the small matrix
-            for (int j = 0; j < blockDim.x; j++)
+            float localtmp = s_a[threadIdx.y * blockDim.x + j] + s_b[j * blockDim.x + threadIdx.x];
+            if (localtmp < tmp)
             {
-                float localtmp = s_a[threadIdx.y * blockDim.x + j] + s_b[j * blockDim.x + threadIdx.x];
-                if (localtmp < tmp)
-                {
-                    tmp = localtmp;
-                }
+                tmp = localtmp;
             }
-
-            // Wait for all threads to finish using current tiles before loading in new ones
-            __syncthreads();
         }
 
-        // Write back results
-        a[row * n + col] = tmp;
+        // Wait for all threads to finish using current tiles before loading in new ones
         __syncthreads();
     }
+    // Write back results
+    a[row * N + col] = tmp;
+    __syncthreads();
 }
